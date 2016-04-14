@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">PipePower</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="banner_ad_unit_id">ca-app-pub-8339160487325972/8667645644</string>
+    <string name="noise_level_max">Максимальный шум:</string>
+    <string name="noise_level">Уровень шума:</string>
+    <string name="low_level">Низкий уровень</string>
+    <string name="middle_level">Средний уровень</string>
+    <string name="low_high_level">Повышенный уровень</string>
+    <string name="high_level">Высокий уровень</string>
+    <string name="very_high_level">Неприемлимый уровень</string>
+
+    <string name="rate_this_app">Оценить приложение?</string>
+    <string name="rate_now">Да</string>
+    <string name="rate_not_now">Не сейчас</string>
+    <string name="rate_never">Никогда</string>
+
+</resources>

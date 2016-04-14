@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">PipePower</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="banner_ad_unit_id">ca-app-pub-8339160487325972/8667645644</string>
+    <string name="noise_level_max">Max noise:</string>
+    <string name="noise_level">Noise level:</string>
+    <string name="low_level">Low level</string>
+    <string name="middle_level">Middle level</string>
+    <string name="low_high_level">Above average level</string>
+    <string name="high_level">High level</string>
+    <string name="very_high_level">Extra high level</string>
+    <string name="rate_this_app">Rate this app?</string>
+
+    <string name="rate_now">Yes</string>
+    <string name="rate_not_now">Not now</string>
+    <string name="rate_never">Never</string>
+
+
+</resources>

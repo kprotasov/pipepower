@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="white" type="color">#FFFFFF</item>
+    <item name="low_level_color" type="color">#FF02ff1b</item>
+    <item name="middle_level_color" type="color">#FFffe402</item>
+    <item name="low_high_level_color" type="color">#FFFCAA3F</item>
+    <item name="high_level_color" type="color">#FFff7302</item>
+    <item name="very_high_color" type="color">#FFff0202</item>
+    <item name="warning_text_color" type="color">#FF89d2e7</item>
+
+</resources>
