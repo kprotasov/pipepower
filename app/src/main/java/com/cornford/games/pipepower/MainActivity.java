@@ -186,7 +186,7 @@ public class MainActivity extends ActionBarActivity {
         valueMeter.stop();
         int maxDb = soundMeterView.getMaxDb();
         Log.v("MainActivity", "save value " + maxDb);
-        saveToDatabase(String.valueOf(maxDb));
+        saveToDatabase(maxDb);
         setWarningLevel(WARNING_LEVEL_STOP, maxDb);
         while(retry){
             try{
@@ -300,8 +300,8 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void saveToDatabase(final String value){
-        Log.v("MainActivity", "saveToDatabase " + value);
+    private void saveToDatabase(final int value){
+        Log.v("SoundValueEntity", "saveToDatabase " + value);
         final SoundValueDbHelper dbHelper = new SoundValueDbHelper(this);
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         final ContentValues contentValues = new ContentValues();
@@ -332,9 +332,11 @@ public class MainActivity extends ActionBarActivity {
 
     private SoundValueEntity cursorToSoundValueEntity(final Cursor cursor){
         SoundValueEntity entity = new SoundValueEntity();
-        entity.setTimestamp(cursor.getLong(0));
-        entity.setValue(cursor.getString(1));
-        Log.v("SoundValueEntity", "read new value timestamp " + entity.getTimestamp() + " value " + entity.getValue());
+        final long timestamp = cursor.getLong(cursor.getColumnIndex(SoundValueContract.SoundValueEntry.COLUMN_NAME_DATE));
+        final int value = cursor.getInt(cursor.getColumnIndex(SoundValueContract.SoundValueEntry.COLUMN_NAME_SOUND_VALUE));
+        entity.setTimestamp(timestamp);
+        entity.setValue(value);
+        Log.v("SoundValueEntity", "read new value timestamp " + timestamp + " value " + value);
         return entity;
     }
 

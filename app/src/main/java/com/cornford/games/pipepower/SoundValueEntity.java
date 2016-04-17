@@ -6,7 +6,7 @@ package com.cornford.games.pipepower;
 public class SoundValueEntity {
 
     private long timestamp;
-    private String value;
+    private int value;
 
     public long getTimestamp() {
         return timestamp;
@@ -16,11 +16,11 @@ public class SoundValueEntity {
         this.timestamp = timestamp;
     }
 
-    public String getValue() {
+    public int getValue() {
         return value;
     }
 
-    public void setValue(final String value) {
+    public void setValue(final int value) {
         this.value = value;
     }
 }

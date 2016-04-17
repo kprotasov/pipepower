@@ -17,11 +17,11 @@ public class SoundValueDbHelper extends SQLiteOpenHelper {
     }
 
     public void onCreate(final SQLiteDatabase db){
-        db.execSQL(SoundValueContract.DataBaseCreater.SQL_CREATE_ENTRIES);
+        db.execSQL(SoundValueContract.DataBaseCreator.SQL_CREATE_ENTRIES);
     }
 
     public void onUpgrade(final SQLiteDatabase db, final int oldVersion, final int newVersion){
-        db.execSQL(SoundValueContract.DataBaseCreater.SQL_DELETE_ENTRIES);
+        db.execSQL(SoundValueContract.DataBaseCreator.SQL_DELETE_ENTRIES);
         onCreate(db);
     }
 
