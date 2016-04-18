@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.cornford.games.pipepower.storevalues.SoundValuesActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -60,10 +61,10 @@ public class MainActivity extends ActionBarActivity {
 
     private static final float AD_VIEW_HEIGHT = 50.0f;
 
-    private int DB_LEVEL_LOW = 50;
-    private int DB_LEVEL_MIDDLE = 65;
-    private int DB_LEVEL_HIGH = 75;
-    private int DB_LEVEL_VERY_HIGH = 85;
+    public static final int DB_LEVEL_LOW = 50;
+    public static final int DB_LEVEL_MIDDLE = 65;
+    public static final int DB_LEVEL_HIGH = 75;
+    public static final int DB_LEVEL_VERY_HIGH = 85;
     private LinearLayout mainContainer;
     private ValueMeter valueMeter;
     private LinearLayout warningLayout;
@@ -160,12 +161,13 @@ public class MainActivity extends ActionBarActivity {
                 }else{
                     //valueMeter.stop();
                     stopWork();
+                    Intent intent = new Intent(MainActivity.this, SoundValuesActivity.class);
+                    startActivity(intent);
                     //showRateThisAppDialog();
                     //saveToDatabase(String.valueOf(soundMeterView.getMaxDb()));
                 }
             }
         });
-        readFromDatabase();
     }
 
     private int getScreenWidth(){
@@ -200,24 +202,6 @@ public class MainActivity extends ActionBarActivity {
             }
         }
 
-    }
-
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
     }
 
     private boolean isRussianLocale(){
@@ -308,36 +292,6 @@ public class MainActivity extends ActionBarActivity {
         contentValues.put(SoundValueContract.SoundValueEntry.COLUMN_NAME_DATE, System.currentTimeMillis());
         contentValues.put(SoundValueContract.SoundValueEntry.COLUMN_NAME_SOUND_VALUE, value);
         db.insert(SoundValueContract.SoundValueEntry.TABLE_NAME, null, contentValues);
-    }
-
-    private ArrayList<SoundValueEntity> readFromDatabase(){
-        final ArrayList<SoundValueEntity> entities = new ArrayList<>();
-        final SoundValueDbHelper dbHelper = new SoundValueDbHelper(this);
-        final SQLiteDatabase db = dbHelper.getReadableDatabase();
-        final String[] projection = {SoundValueContract.SoundValueEntry._ID,
-                SoundValueContract.SoundValueEntry.COLUMN_NAME_DATE,
-                SoundValueContract.SoundValueEntry.COLUMN_NAME_SOUND_VALUE};
-        final String sorting = SoundValueContract.SoundValueEntry.COLUMN_NAME_DATE + " DESC";
-        final Cursor cursor = db.query(SoundValueContract.SoundValueEntry.TABLE_NAME,
-                projection, null, null, null, null, sorting);
-        cursor.moveToFirst();
-        while(!cursor.isAfterLast()){
-            SoundValueEntity entity = cursorToSoundValueEntity(cursor);
-            entities.add(entity);
-            cursor.moveToNext();
-        }
-        cursor.close();
-        return entities;
-    }
-
-    private SoundValueEntity cursorToSoundValueEntity(final Cursor cursor){
-        SoundValueEntity entity = new SoundValueEntity();
-        final long timestamp = cursor.getLong(cursor.getColumnIndex(SoundValueContract.SoundValueEntry.COLUMN_NAME_DATE));
-        final int value = cursor.getInt(cursor.getColumnIndex(SoundValueContract.SoundValueEntry.COLUMN_NAME_SOUND_VALUE));
-        entity.setTimestamp(timestamp);
-        entity.setValue(value);
-        Log.v("SoundValueEntity", "read new value timestamp " + timestamp + " value " + value);
-        return entity;
     }
 
 }
