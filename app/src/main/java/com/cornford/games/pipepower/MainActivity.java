@@ -8,6 +8,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -28,6 +29,7 @@ import android.view.ViewTreeObserver.OnPreDrawListener;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -70,12 +72,15 @@ public class MainActivity extends ActionBarActivity {
     private LinearLayout warningLayout;
     private TextView warningText;
     private TextView levelText;
+    private ImageButton historyButton;
     private Timer timer;
     private SoundMeterView soundMeterView;
     private ToggleButton toggleButton;
     private AppLoop appLoop;
     private MainActivity activity;
     private int START_LISTEN_DELAY = 3;
+
+    private boolean isFirstStart = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,9 +108,10 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        warningLayout = (LinearLayout)findViewById(R.id.warningLayout);
-        warningText = (TextView)findViewById(R.id.warningText);
-        levelText = (TextView)findViewById(R.id.levelText);
+        warningLayout = (LinearLayout) findViewById(R.id.warningLayout);
+        warningText = (TextView) findViewById(R.id.warningText);
+        levelText = (TextView) findViewById(R.id.levelText);
+        historyButton = (ImageButton) findViewById(R.id.open_history_button);
         warningLayout.setVisibility(View.VISIBLE);
         /*if(isRussianLocale()){
             warningLayout.setVisibility(View.VISIBLE);
@@ -114,38 +120,45 @@ public class MainActivity extends ActionBarActivity {
         }*/
 
         float scaleParam = 1;
-        float widthScale = ((float)getScreenWidth() / (float)DISPLAY_DEF_WIDTH);
-        float heightScale = (((float)getScreenHeight() - AD_VIEW_HEIGHT) / (float)DISPLAY_DEF_HEIGHT);
+        float widthScale = ((float) getScreenWidth() / (float) DISPLAY_DEF_WIDTH);
+        float heightScale = (((float) getScreenHeight() - AD_VIEW_HEIGHT) / (float) DISPLAY_DEF_HEIGHT);
         // берем наименьший. иначе может не влезть
-        if (widthScale > heightScale){
+        if (widthScale > heightScale) {
             scaleParam = heightScale;
-        }else{
+        } else {
             scaleParam = widthScale;
         }
 
         ViewGroup.LayoutParams soundMeterParams = soundMeterView.getLayoutParams();
-        soundMeterParams.width = (int)(SOUND_METER_DEF_WIDTH * scaleParam);
-        soundMeterParams.height = (int)(SOUND_METER_DEF_HEIGHT * scaleParam);
+        soundMeterParams.width = (int) (SOUND_METER_DEF_WIDTH * scaleParam);
+        soundMeterParams.height = (int) (SOUND_METER_DEF_HEIGHT * scaleParam);
         soundMeterView.setLayoutParams(soundMeterParams);
 
         ViewGroup.LayoutParams toggleButtonParams = toggleButton.getLayoutParams();
-        toggleButtonParams.width = (int)(TOGGLE_BUTTON_DEF_WIDTH * scaleParam);
-        toggleButtonParams.height = (int)(TOGGLE_BUTTON_DEF_HEIGHT * scaleParam);
+        toggleButtonParams.width = (int) (TOGGLE_BUTTON_DEF_WIDTH * scaleParam);
+        toggleButtonParams.height = (int) (TOGGLE_BUTTON_DEF_HEIGHT * scaleParam);
         toggleButton.setLayoutParams(toggleButtonParams);
 
         activity = this;
+        historyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View view) {
+                Intent intent = new Intent(MainActivity.this, SoundValuesActivity.class);
+                startActivity(intent);
+            }
+        });
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked == true){
+                if (isChecked == true) {
                     timer = new Timer();
                     timer.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            runOnUiThread(new Runnable(){
+                            runOnUiThread(new Runnable() {
                                 @Override
-                                public void run(){
-                                    appLoop = new AppLoop(activity, soundMeterView,  valueMeter);
+                                public void run() {
+                                    appLoop = new AppLoop(activity, soundMeterView, valueMeter);
                                     valueMeter.start();
                                     soundMeterView.clearData();
                                     appLoop.setRunning(true);
@@ -158,11 +171,23 @@ public class MainActivity extends ActionBarActivity {
                         }
                     }, START_LISTEN_DELAY * 100);
 
-                }else{
+                } else {
                     //valueMeter.stop();
                     stopWork();
-                    Intent intent = new Intent(MainActivity.this, SoundValuesActivity.class);
-                    startActivity(intent);
+                    if (getShownCount() == 0){
+                        if (getIsNeverShow() == false) {
+                            showRateThisAppDialog();
+                        }
+                    }
+                    if (getShownCount() == 3){
+                        if (getIsNeverShow() == false) {
+                            showRateThisAppDialog();
+                        }
+                    }
+                    if (isFirstStart == true){
+                        increaseShowCount();
+                        isFirstStart = false;
+                    }
                     //showRateThisAppDialog();
                     //saveToDatabase(String.valueOf(soundMeterView.getMaxDb()));
                 }
@@ -170,74 +195,72 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
-    private int getScreenWidth(){
+    private int getScreenWidth() {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         return metrics.widthPixels;
     }
 
-    private int getScreenHeight(){
+    private int getScreenHeight() {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
         return metrics.heightPixels;
     }
 
-    private void stopWork(){
+    private void stopWork() {
         boolean retry = true;
-        if (appLoop!=null) appLoop.setRunning(false);
+        if (appLoop != null) appLoop.setRunning(false);
         valueMeter.stop();
         int maxDb = soundMeterView.getMaxDb();
-        Log.v("MainActivity", "save value " + maxDb);
-        saveToDatabase(maxDb);
+        if (maxDb > 0) saveToDatabase(maxDb);
         setWarningLevel(WARNING_LEVEL_STOP, maxDb);
-        while(retry){
-            try{
+        while (retry) {
+            try {
                 appLoop.join();
                 appLoop.interrupt();
                 retry = false;
-                //appLoop.stop();
                 soundMeterView.setData(0, true);
-            }catch(InterruptedException ie){
+            } catch (InterruptedException ie) {
                 ie.printStackTrace();
             }
         }
 
     }
 
-    private boolean isRussianLocale(){
+    private boolean isRussianLocale() {
         String lang = Locale.getDefault().getLanguage();
-        if (lang.equals("ru")){
+        if (lang.equals("ru")) {
             return true;
         } else {
             return false;
         }
     }
 
-    public void setWarningLevel(int warningLevel, int dbLevel){
-        if (warningLevel == WARNING_LEVEL_STOP){
+    public void setWarningLevel(int warningLevel, int dbLevel) {
+        if (warningLevel == WARNING_LEVEL_STOP) {
             warningText.setText(getResources().getString(R.string.noise_level_max));
-        }else{
+        } else {
             warningText.setText(getResources().getString(R.string.noise_level));
         }
-        if (dbLevel >= 0 && dbLevel <= DB_LEVEL_LOW){
+        if (dbLevel >= 0 && dbLevel <= DB_LEVEL_LOW) {
             levelText.setText(R.string.low_level);
             levelText.setTextColor(getResources().getColor(R.color.low_level_color));
-        }else if (dbLevel > DB_LEVEL_LOW && dbLevel <= DB_LEVEL_MIDDLE){
+        } else if (dbLevel > DB_LEVEL_LOW && dbLevel <= DB_LEVEL_MIDDLE) {
             levelText.setText(R.string.middle_level);
             levelText.setTextColor(getResources().getColor(R.color.middle_level_color));
-        }else if (dbLevel > DB_LEVEL_MIDDLE && dbLevel <= DB_LEVEL_HIGH){
+        } else if (dbLevel > DB_LEVEL_MIDDLE && dbLevel <= DB_LEVEL_HIGH) {
             levelText.setTextColor(getResources().getColor(R.color.low_high_level_color));
             levelText.setText(R.string.low_high_level);
-        }else if (dbLevel > DB_LEVEL_HIGH && dbLevel < DB_LEVEL_VERY_HIGH) {
+        } else if (dbLevel > DB_LEVEL_HIGH && dbLevel < DB_LEVEL_VERY_HIGH) {
             levelText.setTextColor(getResources().getColor(R.color.high_level_color));
             levelText.setText(R.string.high_level);
-        }else if (dbLevel > DB_LEVEL_VERY_HIGH){
+        } else if (dbLevel > DB_LEVEL_VERY_HIGH) {
             levelText.setTextColor(getResources().getColor(R.color.very_high_color));
             levelText.setText(R.string.very_high_level);
         }
     }
 
-    private void showRateThisAppDialog(){
+    private void showRateThisAppDialog() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final LayoutInflater inflater = LayoutInflater.from(this);
         final View view = inflater.inflate(R.layout.rate_app_dialog, null);
@@ -269,6 +292,7 @@ public class MainActivity extends ActionBarActivity {
         rateNever.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                saveIsNeverShow();
                 dialog.dismiss();
             }
         });
@@ -284,14 +308,37 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void saveToDatabase(final int value){
-        Log.v("SoundValueEntity", "saveToDatabase " + value);
+    private void saveToDatabase(final int value) {
         final SoundValueDbHelper dbHelper = new SoundValueDbHelper(this);
         final SQLiteDatabase db = dbHelper.getWritableDatabase();
         final ContentValues contentValues = new ContentValues();
         contentValues.put(SoundValueContract.SoundValueEntry.COLUMN_NAME_DATE, System.currentTimeMillis());
         contentValues.put(SoundValueContract.SoundValueEntry.COLUMN_NAME_SOUND_VALUE, value);
         db.insert(SoundValueContract.SoundValueEntry.TABLE_NAME, null, contentValues);
+    }
+
+    private static final String IS_NEWER_SHOW = "IS_NEWER_SHOW";
+    private boolean getIsNeverShow(){ // не показывать больше никогда
+        final SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        return preferences.getBoolean(IS_NEWER_SHOW, false);
+    }
+
+    private void saveIsNeverShow(){
+        final SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        preferences.edit().putBoolean(IS_NEWER_SHOW, true).apply();
+    }
+
+    private static final String SHOWN_COUNT = "SHOWN_COUNT";
+    private int getShownCount(){ // сколько раз было показано
+        final SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        return preferences.getInt(SHOWN_COUNT, 0);
+    }
+
+    private void increaseShowCount(){
+        int shownCount = getShownCount();
+        final SharedPreferences preferences = getPreferences(MODE_PRIVATE);
+        shownCount ++;
+        preferences.edit().putInt(SHOWN_COUNT, shownCount).apply();
     }
 
 }

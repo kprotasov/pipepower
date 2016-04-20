@@ -21,6 +21,14 @@
         android:gravity="center"
         android:id="@+id/appContainer">
 
+        <ImageButton
+            android:id="@+id/open_history_button"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/history_button"
+            android:background="@null"/>
+
         <com.cornford.games.pipepower.SoundMeterView
             android:layout_width="300dp"
             android:layout_height="300dp"

@@ -41,7 +41,7 @@
         android:text="15:04:2016"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="20dp"
+        android:textSize="15dp"
         android:textColor="#FF89d2e7"/>
 
 </LinearLayout>
