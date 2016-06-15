@@ -205,6 +205,23 @@ public class MainActivity extends ActionBarActivity {
         });
     }
 
+    private void startRecord() {
+        // start recording and stop when 15 sec left
+        recordManager.startRecordTest(FileUtils.createFile());
+        final Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        recordManager.stopRecordingTest();
+                    }
+                }).start();
+            }
+        }, Constants.getRecordingLength());
+    }
+
     private int getScreenWidth() {
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
