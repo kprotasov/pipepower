@@ -19,6 +19,8 @@ import java.util.ArrayList;
  */
 public class SoundValuesActivity extends Activity {
 
+    private static final int MAX_COUNT = 100;
+
     private ArrayList<SoundValueEntity> soundList = new ArrayList<>();
     private SoundValuesAdapter adapter;
     private ListView listView;
@@ -45,9 +47,15 @@ public class SoundValuesActivity extends Activity {
         final Cursor cursor = db.query(SoundValueContract.SoundValueEntry.TABLE_NAME,
                 projection, null, null, null, null, sorting);
         cursor.moveToFirst();
+        int count = 0;
         while(!cursor.isAfterLast()){
-            SoundValueEntity entity = cursorToSoundValueEntity(cursor);
-            soundList.add(entity);
+            final SoundValueEntity entity = cursorToSoundValueEntity(cursor);
+            if (count <= MAX_COUNT) {
+                soundList.add(entity);
+            }else{
+                dbHelper.deleteRow(db, entity);
+            }
+            count ++;
             cursor.moveToNext();
         }
         cursor.close();

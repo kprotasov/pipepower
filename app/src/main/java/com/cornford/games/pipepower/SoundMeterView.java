@@ -19,6 +19,11 @@ import android.view.View;
  */
 public class SoundMeterView extends View {
 
+    private static final int DELTA_PLUS = 50;
+    private static final int DELTA_MINUS = -DELTA_PLUS;
+    private int alpha = DELTA_MINUS;
+    private int delta = 0;
+
     private Bitmap speedometerBase;
     private Bitmap speedometerArrow;
     private Bitmap arrowCenter;
@@ -27,6 +32,7 @@ public class SoundMeterView extends View {
     private Paint textPaint;
     private Paint levelPaint;
     private float textAreaHeight = 165;
+    private String calculationString;
 
     public SoundMeterView (Context context){
         super(context);
@@ -48,6 +54,7 @@ public class SoundMeterView extends View {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
             this.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
+        calculationString = getContext().getString(R.string.calculation);
         speedometerBase = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.speedometer_base);
 
         BitmapFactory.Options options = new BitmapFactory.Options();
@@ -60,7 +67,7 @@ public class SoundMeterView extends View {
         Typeface tf = Typeface.createFromAsset(getContext().getAssets(), "font/Franklin Gothic Demi Cond Regular.ttf");
         textPaint.setTypeface(tf);
         textPaint.setTextSize(30);
-        textPaint.setColor(Color.parseColor("#00b0e3"));
+        textPaint.setColor(Color.argb(255, 0, 176, 227));
 
         levelPaint = new Paint();
         Typeface tf2 = Typeface.createFromAsset(getContext().getAssets(), "font/Franklin Gothic Demi Cond Regular.ttf");
@@ -130,7 +137,28 @@ public class SoundMeterView extends View {
         m.postRotate(degrees, (int) (xcp + arrowCenter.getWidth() * 0.5), (int) (ycp + arrowCenter.getHeight() * 0.5));
         canvas.drawBitmap(speedometerArrow, m, null);
 
-        String dBText = "max " + String.valueOf(maxDb) + " dB";
+        String dBText;
+        if (maxDb <= 0) {
+            if (alpha <= 0){
+                delta = DELTA_PLUS;
+            }else if (alpha >= 255){
+                delta = DELTA_MINUS;
+            }
+            alpha += delta;
+            if (alpha > 255){
+                alpha = 255;
+            }
+            if (alpha < 0){
+                alpha = 0;
+            }
+            Log.v("SoundMeterValue", "maxDb " + maxDb + " alpha " + alpha);
+            textPaint.setColor(Color.argb(alpha, 0, 176, 227));
+            dBText = calculationString;
+
+        }else{
+            textPaint.setColor(Color.argb(255, 0, 176, 227));
+            dBText ="max " + String.valueOf(maxDb) + " dB";
+        }
         Rect textRect = new Rect();
         textPaint.getTextBounds(dBText, 0, dBText.length() - 1, textRect);
         canvas.drawText(dBText, (float) (speedometerBase.getWidth() * 0.5 - textRect.width() * 0.5),

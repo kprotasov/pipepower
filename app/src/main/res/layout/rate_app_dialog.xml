@@ -26,21 +26,24 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="@string/rate_now"/>
+            android:text="@string/rate_now"
+            android:textSize="12sp"/>
 
         <Button
             android:id="@+id/rate_not_now"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="@string/rate_not_now"/>
+            android:text="@string/rate_not_now"
+            android:textSize="12sp"/>
 
         <Button
             android:id="@+id/rate_never"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="match_parent"
-            android:text="@string/rate_never"/>
+            android:text="@string/rate_never"
+            android:textSize="12sp"/>
 
     </LinearLayout>
 

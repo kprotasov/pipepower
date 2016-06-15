@@ -29,4 +29,9 @@ public class SoundValueDbHelper extends SQLiteOpenHelper {
         onUpgrade(db, oldVersion, newVersion);
     }
 
+    public void deleteRow(final SQLiteDatabase db, final SoundValueEntity entity){
+        final String[] whereArgs = {String.valueOf(entity.getTimestamp())};
+        db.delete(SoundValueContract.SoundValueEntry.TABLE_NAME, SoundValueContract.SoundValueEntry.COLUMN_NAME_DATE + "=?", whereArgs);
+    }
+
 }

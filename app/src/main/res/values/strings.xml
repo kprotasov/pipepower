@@ -18,5 +18,7 @@
     <string name="rate_not_now">Not now</string>
     <string name="rate_never">Never</string>
 
+    <string name="calculation">calculation...</string>
+
 
 </resources>

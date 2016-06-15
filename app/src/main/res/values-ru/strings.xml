@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">PipePower</string>
+    <string name="sound_values">История</string>
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
@@ -17,5 +18,7 @@
     <string name="rate_now">Да</string>
     <string name="rate_not_now">Не сейчас</string>
     <string name="rate_never">Никогда</string>
+
+    <string name="calculation">рассчет...</string>
 
 </resources>

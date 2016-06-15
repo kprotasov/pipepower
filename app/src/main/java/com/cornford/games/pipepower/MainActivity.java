@@ -80,6 +80,10 @@ public class MainActivity extends ActionBarActivity {
     private MainActivity activity;
     private int START_LISTEN_DELAY = 3;
 
+    private static final int RATE_SHOW_1 = 0;
+    private static final int RATE_SHOW_2 = 5;
+    private static final int RATE_SHOW_3 = 15;
+
     private boolean isFirstStart = true;
 
     @Override
@@ -143,7 +147,7 @@ public class MainActivity extends ActionBarActivity {
         historyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
-                Intent intent = new Intent(MainActivity.this, SoundValuesActivity.class);
+                final Intent intent = new Intent(MainActivity.this, SoundValuesActivity.class);
                 startActivity(intent);
             }
         });
@@ -174,17 +178,23 @@ public class MainActivity extends ActionBarActivity {
                 } else {
                     //valueMeter.stop();
                     stopWork();
-                    if (getShownCount() == 0){
+                    if (getShownCount() == RATE_SHOW_1) {
                         if (getIsNeverShow() == false) {
                             showRateThisAppDialog();
                         }
                     }
-                    if (getShownCount() == 3){
+                    if (getShownCount() == RATE_SHOW_2) {
                         if (getIsNeverShow() == false) {
                             showRateThisAppDialog();
                         }
                     }
-                    if (isFirstStart == true){
+                    if (getShownCount() == RATE_SHOW_3) {
+                        if (getIsNeverShow() == false) {
+                            showRateThisAppDialog();
+                            saveIsNeverShow();
+                        }
+                    }
+                    if (isFirstStart == true) {
                         increaseShowCount();
                         isFirstStart = false;
                     }
@@ -274,6 +284,7 @@ public class MainActivity extends ActionBarActivity {
                 intent.setData(Uri.parse("market://details?id=com.cornford.games.pipepower"));
                 if (!startIntent(intent)) {
                     intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.cornford.games.pipepower"));
+                    saveIsNeverShow();
                     if (!startIntent(intent)) {
                         Toast.makeText(MainActivity.this, "Could not open Android market, please install the market app.", Toast.LENGTH_SHORT).show();
                     }
@@ -318,26 +329,28 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private static final String IS_NEWER_SHOW = "IS_NEWER_SHOW";
-    private boolean getIsNeverShow(){ // не показывать больше никогда
+
+    private boolean getIsNeverShow() { // не показывать больше никогда
         final SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         return preferences.getBoolean(IS_NEWER_SHOW, false);
     }
 
-    private void saveIsNeverShow(){
+    private void saveIsNeverShow() {
         final SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         preferences.edit().putBoolean(IS_NEWER_SHOW, true).apply();
     }
 
     private static final String SHOWN_COUNT = "SHOWN_COUNT";
-    private int getShownCount(){ // сколько раз было показано
+
+    private int getShownCount() { // сколько раз было показано
         final SharedPreferences preferences = getPreferences(MODE_PRIVATE);
         return preferences.getInt(SHOWN_COUNT, 0);
     }
 
-    private void increaseShowCount(){
+    private void increaseShowCount() {
         int shownCount = getShownCount();
         final SharedPreferences preferences = getPreferences(MODE_PRIVATE);
-        shownCount ++;
+        shownCount++;
         preferences.edit().putInt(SHOWN_COUNT, shownCount).apply();
     }
 
