@@ -170,6 +170,7 @@ public class MainActivity extends ActionBarActivity {
                                         appLoop.start();
 
                                     }
+                                    startRecord();
                                 }
                             });
                         }
@@ -207,7 +208,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void startRecord() {
         // start recording and stop when 15 sec left
-        recordManager.startRecordTest(FileUtils.createFile());
+        //recordManager.startRecordTest(FileUtils.createFile());
         final Timer timer = new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -215,11 +216,13 @@ public class MainActivity extends ActionBarActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        recordManager.stopRecordingTest();
+                        //recordManager.stopRecordingTest();
+                        valueMeter.stopRecording();
                     }
                 }).start();
             }
         }, Constants.getRecordingLength());
+
     }
 
     private int getScreenWidth() {
