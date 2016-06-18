@@ -36,55 +36,6 @@ public class ValueMeter {
         bufferSize = bufferSize * 4;
         rec = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
         rec.startRecording();
-        startRecording();
-    }
-
-    private void startRecording() {
-        isRecording = true;
-        recordingThread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                writeAudioDataToFile();
-            }
-        });
-        recordingThread.start();
-    }
-
-    private byte[] shortToByte(short[] sData) {
-        int shortArrsize = sData.length;
-        byte[] bytes = new byte[shortArrsize * 2];
-        for (int i = 0; i < shortArrsize; i++) {
-            bytes[i * 2] = (byte) (sData[i] & 0x00FF);
-            bytes[(i * 2) + 1] = (byte) (sData[i] >> 8);
-            sData[i] = 0;
-        }
-        return bytes;
-
-    }
-
-    private void writeAudioDataToFile() {
-        String filePath = FileUtils.createFile();
-        short[] data = new short[bufferElementsToRec];
-        FileOutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(filePath);
-        } catch (final FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        while (isRecording) {
-            rec.read(data, 0, bufferElementsToRec);
-            try {
-                byte[] byteData = shortToByte(data);
-                outputStream.write(byteData, 0, bufferElementsToRec * bufferPerElement);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        }
-        try {
-            outputStream.close();
-        }catch (final IOException e) {
-            e.printStackTrace();
-        }
     }
 
     public void stopRecording() {

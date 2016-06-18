@@ -79,20 +79,6 @@
             android:layout_centerHorizontal="true"
             android:layout_gravity="bottom"/>
 
-        <ToggleButton
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:text=""
-            android:textOn="@null"
-            android:textOff="@null"
-            android:id="@+id/recordButton"
-            android:background="@drawable/record_selector"
-            android:layout_gravity="bottom"
-            android:layout_alignParentBottom="true"
-            android:layout_toRightOf="@+id/toggleButton"
-            android:layout_toEndOf="@+id/toggleButton"
-            android:layout_marginBottom="30dp" />
-
     </RelativeLayout>
 
     <com.google.android.gms.ads.AdView
