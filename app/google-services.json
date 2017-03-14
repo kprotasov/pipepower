@@ -1,0 +1,38 @@
+{
+  "project_info": {
+    "project_number": "763160616889",
+    "project_id": "firebase-sound-meter"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:763160616889:android:e707695aac78ed0e",
+        "android_client_info": {
+          "package_name": "com.cornford.games.pipepower"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC8MavEC8MRBvIZ9NQAe9dtpT-L55bJDSs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-81326163-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

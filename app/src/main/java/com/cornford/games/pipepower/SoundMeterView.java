@@ -66,7 +66,8 @@ public class SoundMeterView extends View {
         textPaint = new Paint();
         Typeface tf = Typeface.createFromAsset(getContext().getAssets(), "font/Franklin Gothic Demi Cond Regular.ttf");
         textPaint.setTypeface(tf);
-        textPaint.setTextSize(30);
+        final float dpScale = getResources().getDisplayMetrics().density;
+        textPaint.setTextSize(20 * dpScale);
         textPaint.setColor(Color.argb(255, 0, 176, 227));
 
         levelPaint = new Paint();
@@ -151,6 +152,7 @@ public class SoundMeterView extends View {
             if (alpha < 0){
                 alpha = 0;
             }
+
             Log.v("SoundMeterValue", "maxDb " + maxDb + " alpha " + alpha);
             textPaint.setColor(Color.argb(alpha, 0, 176, 227));
             dBText = calculationString;

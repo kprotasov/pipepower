@@ -52,7 +52,7 @@ public class SoundValuesAdapter extends ArrayAdapter<SoundValueEntity> {
         final SoundValueEntity item = getItem(position);
         holder.value.setText(String.valueOf(item.getValue()));
         setWarningLevel(item.getValue(), holder.value, holder.levelText);
-        String dateString= DateFormat.format("dd/mm/yyyy - kk:mm", new Date(item.getTimestamp())).toString();
+        String dateString= DateFormat.format("dd/MM/yyyy - kk:mm", new Date(item.getTimestamp())).toString();
         holder.date.setText(dateString);
         return convertView;
     }
