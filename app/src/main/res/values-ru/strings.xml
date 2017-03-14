@@ -6,6 +6,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="banner_ad_unit_id">ca-app-pub-8339160487325972/8667645644</string>
+    <string name="banner_ad_unit_history">ca-app-pub-8339160487325972/8237516441</string>
     <string name="noise_level_max">Максимальный шум:</string>
     <string name="noise_level">Уровень шума:</string>
     <string name="low_level">Низкий уровень</string>

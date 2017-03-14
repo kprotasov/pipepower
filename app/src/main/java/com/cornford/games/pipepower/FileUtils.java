@@ -10,7 +10,7 @@ import java.io.File;
 public class FileUtils {
 
     private static final String PATH_WITH_SD = "/pipepower/record/";
-    private static final String EXTENSION = ".3gp";
+    private static final String EXTENSION = ".pcm";//".3gp";
     private static final String FILE_PREFIX = "record";
 
     public static boolean isSdCardExist() {

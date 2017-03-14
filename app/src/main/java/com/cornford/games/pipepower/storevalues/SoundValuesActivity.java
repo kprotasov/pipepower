@@ -5,12 +5,16 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.cornford.games.pipepower.R;
 import com.cornford.games.pipepower.SoundValueContract;
 import com.cornford.games.pipepower.SoundValueDbHelper;
 import com.cornford.games.pipepower.SoundValueEntity;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
 
 import java.util.ArrayList;
 
@@ -24,11 +28,30 @@ public class SoundValuesActivity extends Activity {
     private ArrayList<SoundValueEntity> soundList = new ArrayList<>();
     private SoundValuesAdapter adapter;
     private ListView listView;
+    private LinearLayout parentContainer;
 
     @Override
     public void onCreate(final Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sound_list_view);
+
+        parentContainer = (LinearLayout) findViewById(R.id.parentContainer);
+
+        AdView mAdView = (AdView) findViewById(R.id.adViewList);
+        AdRequest adRequest = new AdRequest.Builder().build();//.addTestDevice("FBF9D9A996CCF942022738FDB7816B1E").build();
+        mAdView.loadAd(adRequest);
+        mAdView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                super.onAdLoaded();
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        parentContainer.requestLayout();
+                    }
+                });
+            }
+        });
 
         listView = (ListView) findViewById(R.id.listView);
         adapter = new SoundValuesAdapter(this, R.layout.sound_value_item, soundList);

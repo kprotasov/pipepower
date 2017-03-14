@@ -76,6 +76,7 @@ public class MainActivity extends ActionBarActivity {
     private Timer timer;
     private SoundMeterView soundMeterView;
     private ToggleButton toggleButton;
+    private ToggleButton playPauseButton;
     private AppLoop appLoop;
     private MainActivity activity;
     private int START_LISTEN_DELAY = 3;
@@ -86,6 +87,8 @@ public class MainActivity extends ActionBarActivity {
 
     private boolean isFirstStart = true;
 
+    private String currentSoundPath;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,10 +97,11 @@ public class MainActivity extends ActionBarActivity {
         valueMeter = new ValueMeter();
         mainContainer = (LinearLayout) findViewById(R.id.mainContainer);
         toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
+        playPauseButton = (ToggleButton) findViewById(R.id.recordButton);
         soundMeterView = (SoundMeterView) findViewById(R.id.soundMeterView);
 
         AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().addTestDevice("FBF9D9A996CCF942022738FDB7816B1E").build();
+        AdRequest adRequest = new AdRequest.Builder().build();//.addTestDevice("FBF9D9A996CCF942022738FDB7816B1E").build();
         mAdView.loadAd(adRequest);
         mAdView.setAdListener(new AdListener() {
             @Override
@@ -155,6 +159,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked == true) {
+                    currentSoundPath = FileUtils.createFile();
                     timer = new Timer();
                     timer.schedule(new TimerTask() {
                         @Override
@@ -163,7 +168,7 @@ public class MainActivity extends ActionBarActivity {
                                 @Override
                                 public void run() {
                                     appLoop = new AppLoop(activity, soundMeterView, valueMeter);
-                                    valueMeter.start();
+                                    valueMeter.start(currentSoundPath);
                                     soundMeterView.clearData();
                                     appLoop.setRunning(true);
                                     if (appLoop.getState() == Thread.State.NEW) {
@@ -202,6 +207,12 @@ public class MainActivity extends ActionBarActivity {
                     //showRateThisAppDialog();
                     //saveToDatabase(String.valueOf(soundMeterView.getMaxDb()));
                 }
+            }
+        });
+        playPauseButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(final CompoundButton buttonView, final boolean isChecked) {
+                SoundPlayer.playSound(currentSoundPath);
             }
         });
     }
@@ -346,6 +357,7 @@ public class MainActivity extends ActionBarActivity {
         contentValues.put(SoundValueContract.SoundValueEntry.COLUMN_NAME_DATE, System.currentTimeMillis());
         contentValues.put(SoundValueContract.SoundValueEntry.COLUMN_NAME_SOUND_VALUE, value);
         db.insert(SoundValueContract.SoundValueEntry.TABLE_NAME, null, contentValues);
+        dbHelper.close();
     }
 
     private static final String IS_NEWER_SHOW = "IS_NEWER_SHOW";

@@ -86,6 +86,7 @@
             android:textOn="@null"
             android:textOff="@null"
             android:id="@+id/recordButton"
+            android:visibility="gone"
             android:background="@drawable/record_selector"
             android:layout_gravity="bottom"
             android:layout_alignParentBottom="true"

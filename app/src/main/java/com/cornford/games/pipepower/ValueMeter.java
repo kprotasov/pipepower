@@ -8,21 +8,24 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 /**
  * Created by kprotasov on 14.02.2015.
  */
 public class ValueMeter {
 
+    public static final int SAMPLE_RATE_IN_HZ = /*11025;*/44100;
     private static double EMA = 0.0;
     private static final double EMA_FILTER = 0.6;
     private MediaRecorder mediaRecorder;
     private AudioRecord rec;
     private double dbLevel;
-    private static final int SAMPLE_RATE_IN_HZ = 44100;
 
     int bufferSize;
 
@@ -31,12 +34,15 @@ public class ValueMeter {
     private boolean isRecording = false;
     private Thread recordingThread;
 
-    public void start(){
+    private String filePath;
+
+    public void start(final String fileName){
+        this.filePath = fileName;
         bufferSize = AudioRecord.getMinBufferSize(SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
-        bufferSize = bufferSize * 4;
+        //bufferSize = bufferSize * 4;
         rec = new AudioRecord(MediaRecorder.AudioSource.MIC, SAMPLE_RATE_IN_HZ, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT, bufferSize);
         rec.startRecording();
-        startRecording();
+        //startRecording();
     }
 
     private void startRecording() {
@@ -50,7 +56,7 @@ public class ValueMeter {
         recordingThread.start();
     }
 
-    private byte[] shortToByte(short[] sData) {
+    /*private byte[] shortToByte(short[] sData) {
         int shortArrsize = sData.length;
         byte[] bytes = new byte[shortArrsize * 2];
         for (int i = 0; i < shortArrsize; i++) {
@@ -59,11 +65,27 @@ public class ValueMeter {
             sData[i] = 0;
         }
         return bytes;
-
-    }
+    }*/
 
     private void writeAudioDataToFile() {
-        String filePath = FileUtils.createFile();
+        try {
+            final OutputStream outputStream = new FileOutputStream(filePath);
+            final BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(outputStream);
+            final DataOutputStream dataOutputStream = new DataOutputStream(bufferedOutputStream);
+            short[] audioData = new short[bufferSize];
+            while(isRecording) {
+                final int numberOfShort = rec.read(audioData, 0, bufferSize);
+                for (int i = 0; i < numberOfShort; i++) {
+                    dataOutputStream.writeShort(audioData[i]);
+                }
+            }
+            dataOutputStream.close();
+        }catch (final IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /*private void writeAudioDataToFile() {
         short[] data = new short[bufferElementsToRec];
         FileOutputStream outputStream = null;
         try {
@@ -85,7 +107,7 @@ public class ValueMeter {
         }catch (final IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     public void stopRecording() {
         isRecording = false;
@@ -101,13 +123,7 @@ public class ValueMeter {
         short data[] = new short[bufferSize];
         double average = 0.0;
         rec.read(data, 0, bufferSize);
-        /**for (short s : data){
-            if (s > 0){
-                average += Math.abs(s);
-            }else{
-                bufferSize --;
-            }
-        }*/int max = 0;
+        int max = 0;
         for (short s : data)
         {
             if (Math.abs(s) > max)
@@ -123,43 +139,6 @@ public class ValueMeter {
         db = 20 * Math.log10(p / p0);
         dbLevel = db;
         return db;
-    }
-
-    public double getDbLevelAsync(){
-        return dbLevel;
-    }
-
-    public double getDbLevel(){
-        int bufferSizeS = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT);
-        bufferSizeS = bufferSizeS * 4;
-        AudioRecord recorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_DEFAULT, AudioFormat.ENCODING_PCM_16BIT, bufferSizeS);
-        short data[] = new short[bufferSizeS];
-        double average = 0.0;
-        recorder.startRecording();
-        recorder.read(data, 0, bufferSizeS);
-        recorder.stop();
-        for (short s : data){
-            if (s > 0){
-                average += Math.abs(s);
-            }else{
-                bufferSizeS --;
-            }
-        }
-        double x = average / bufferSizeS;
-        recorder.release();
-        double db = 0.0;
-        double p = x / 51805.5336;
-        double p0 = 0.00002;
-        db = 20 * Math.log10(p / p0);
-        return db;
-    }
-
-    public double getDbAmplitude(){
-        double amp = mediaRecorder.getMaxAmplitude();
-        EMA = EMA_FILTER * amp + (1.0 - EMA_FILTER) * EMA;
-        double p = mediaRecorder.getMaxAmplitude() / 51805.5336;
-        double p0 = 0.00002;
-        return 20 * Math.log10(p / p0);
     }
 
 }
