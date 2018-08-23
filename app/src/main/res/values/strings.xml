@@ -21,45 +21,26 @@
 
     <string name="calculation">calculation...</string>
 
-    <string name="privacy_policy_text">PipePrower Privacy Policy \n\n
+    <string name="accept_privacy_policy">Accept</string>
+    <string name="close_privacy_policy">Close</string>
 
-        This Privacy policy will notify that how we collect, use, share and disclose your information.
-        By installing the apps on your device, entering into, connecting to, accessing and/or using the apps,
-        you agree to this privacy policy and give an explicit and informed consent to the processing.
-        If you do not agree to this privacy policy, please uninstall and do not use this apps.\n\n
-
-
-        What information we use\n
-
-        This sound meter app use your 'RECORD AUDIO FEATURES' that can be associated with your non-personal information.\n\n
-
-
-        How we use this information\n
-
-        We use record audio feature to make sound meter's decibel value.\n\n
-
-
-        Rest information\n
-
-        We may collect, use, share and disclose below information to provide you with a safe,
-        efficient and customized experience and to provide you with services and features that better meet your needs or requests.\n
-
-        We may collect, use and share non-personal information such as your device model number, operating system version,
-        country code, Device ID, IP address and other properties.
-        And we may disclose non-personal information to third parties and/or allow third parties to collect non-personal
-        information through their own embedded technology. In order to deliver ads to you,
-        the third-party advertising companies may place or recognize unique cookies, anonymous identifiers or similar technology
-        for non-personally identifiable information.\n
-
-        We may use personal information to send emails to you about the apps, such as new features and services,
-        special offers, order issues and updated information.\n\n
-
-
-        Contact us\n
-
-        If you have any questions regarding privacy while using the Apps, please contact us via email at
-        games.kkprotasov@gmail.com
-        Capcorn Interactive Team </string>
+    <string name="privacy_policy_text">PipePower Privacy Policy\n\n This Privacy policy will notify that how we
+        collect, use, share and disclose your information. By installing the apps on your device, entering into,
+        connecting to, accessing and/or using the apps, you agree to this privacy policy and give an explicit and
+        informed consent to the processing. If you do not agree to this privacy policy, please uninstall and do not use
+        this apps.\n\nWhat information we use\nThis sound meter app use your ‘RECORD AUDIO FEATURES’ that can be
+        associated with your non-personal information.\n\nHow we use this information\nWe use record audio feature to
+        make sound meter’s decibel value.\n\nRest information\nWe may collect, use, share and disclose below information
+        to provide you with a safe, efficient and customized experience and to provide you with services and features
+        that better meet your needs or requests.\nWe may collect, use and share non-personal information such as your
+        device model number, operating system version, country code, Device ID, IP address and other properties. And we
+        may disclose non-personal information to third parties and/or allow third parties to collect non-personal
+        information through their own embedded technology. In order to deliver ads to you, the third-party advertising
+        companies may place or recognize unique cookies, anonymous identifiers or similar technology for non-personally
+        identifiable information.\nWe may use personal information to send emails to you about the apps, such as new
+        features and services, special offers, order issues and updated information.\n\nContact us\nIf you have any
+        questions regarding privacy while using the Apps, please contact us via email
+        at\ngames.kkprotasov@gmail.com\nCapcorn Interactive Team</string>
 
 
 </resources>

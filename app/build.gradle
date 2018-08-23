@@ -9,8 +9,8 @@ android {
         applicationId "com.cornford.games.pipepower"
         minSdkVersion 9
         targetSdkVersion 21
-        versionCode 3
-        versionName "1.4"
+        versionCode 4
+        versionName "1.5"
     }
     buildTypes {
         release {
