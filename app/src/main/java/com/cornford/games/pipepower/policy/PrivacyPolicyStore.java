@@ -1,7 +1,9 @@
-package com.cornford.games.pipepower;
+package com.cornford.games.pipepower.policy;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import com.cornford.games.pipepower.data.SharedPreferencesUtils;
 
 /**
  * User: kprotasov

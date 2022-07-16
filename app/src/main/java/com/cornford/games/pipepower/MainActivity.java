@@ -1,55 +1,50 @@
 package com.cornford.games.pipepower;
 
-import android.app.ActionBar;
-import android.app.Activity;
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
 import android.net.Uri;
-import android.provider.Settings;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.telephony.TelephonyManager;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.Display;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnPreDrawListener;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.bumptech.glide.Glide;
+import com.cornford.games.pipepower.data.AppDataStore;
+import com.cornford.games.pipepower.data.SoundValueContract;
+import com.cornford.games.pipepower.data.SoundValueDbHelper;
+import com.cornford.games.pipepower.graph.SoundGraphView;
 import com.cornford.games.pipepower.storevalues.SoundValuesActivity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.graphics.ColorUtils;
 
-public class MainActivity extends ActionBarActivity {
+
+public class MainActivity extends AppCompatActivity {
 
     private static final int SOUND_METER_DEF_WIDTH = 432;
     private static final int SOUND_METER_DEF_HEIGHT = 450;
@@ -77,6 +72,8 @@ public class MainActivity extends ActionBarActivity {
     private SoundMeterView soundMeterView;
     private ToggleButton toggleButton;
     private ToggleButton playPauseButton;
+    private TextView soundValueTextView;
+    private TextView maxDbTextView;
     private AppLoop appLoop;
     private MainActivity activity;
     private int START_LISTEN_DELAY = 3;
@@ -89,19 +86,46 @@ public class MainActivity extends ActionBarActivity {
 
     private String currentSoundPath;
 
+    private static final int REQUEST_RECORD_AUDIO_PERMISSION = 200;
+    private boolean permissionToRecordAccepted = false;
+    private String [] permissions = {Manifest.permission.RECORD_AUDIO};
+
+    //private FirebaseAnalytics firebaseAnalytics;
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (permissions.length <= 0) {
+            return;
+        }
+        switch (requestCode){
+            case REQUEST_RECORD_AUDIO_PERMISSION:
+                permissionToRecordAccepted  = grantResults[0] == PackageManager.PERMISSION_GRANTED;
+                break;
+        }
+        if (!permissionToRecordAccepted ) finish();
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ActivityCompat.requestPermissions(this, permissions, REQUEST_RECORD_AUDIO_PERMISSION);
+
+        //firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        //logScreenOpened();
+
         setContentView(R.layout.activity_main);
         valueMeter = new ValueMeter();
-        mainContainer = (LinearLayout) findViewById(R.id.mainContainer);
-        toggleButton = (ToggleButton) findViewById(R.id.toggleButton);
-        playPauseButton = (ToggleButton) findViewById(R.id.recordButton);
-        soundMeterView = (SoundMeterView) findViewById(R.id.soundMeterView);
+        mainContainer = findViewById(R.id.mainContainer);
+        toggleButton = findViewById(R.id.toggleButton);
+        playPauseButton = findViewById(R.id.recordButton);
+        soundMeterView = findViewById(R.id.soundMeterView);
+        soundValueTextView = findViewById(R.id.soundValueTextView);
+        maxDbTextView = findViewById(R.id.maxDbTextView);
 
-        AdView mAdView = (AdView) findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();//.addTestDevice("FBF9D9A996CCF942022738FDB7816B1E").build();
+        AdView mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("DEE6B64D413427EA2E32503865D21D83").build();
         mAdView.loadAd(adRequest);
         mAdView.setAdListener(new AdListener() {
             @Override
@@ -116,16 +140,11 @@ public class MainActivity extends ActionBarActivity {
             }
         });
 
-        warningLayout = (LinearLayout) findViewById(R.id.warningLayout);
-        warningText = (TextView) findViewById(R.id.warningText);
-        levelText = (TextView) findViewById(R.id.levelText);
-        historyButton = (ImageButton) findViewById(R.id.open_history_button);
-        warningLayout.setVisibility(View.VISIBLE);
-        /*if(isRussianLocale()){
-            warningLayout.setVisibility(View.VISIBLE);
-        }else{
-            warningLayout.setVisibility(View.GONE);
-        }*/
+        warningLayout = findViewById(R.id.warningLayout);
+        warningText = findViewById(R.id.warningText);
+        levelText = findViewById(R.id.levelText);
+        historyButton = findViewById(R.id.open_history_button);
+        //warningLayout.setVisibility(View.VISIBLE);
 
         float scaleParam = 1;
         float widthScale = ((float) getScreenWidth() / (float) DISPLAY_DEF_WIDTH);
@@ -147,6 +166,8 @@ public class MainActivity extends ActionBarActivity {
         toggleButtonParams.height = (int) (TOGGLE_BUTTON_DEF_HEIGHT * scaleParam);
         toggleButton.setLayoutParams(toggleButtonParams);
 
+        final SoundGraphView soundGraphView = findViewById(R.id.soundGraphView);
+
         activity = this;
         historyButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,7 +188,7 @@ public class MainActivity extends ActionBarActivity {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    appLoop = new AppLoop(activity, soundMeterView, valueMeter);
+                                    appLoop = new AppLoop(activity, soundMeterView, soundGraphView, valueMeter);
                                     valueMeter.start(currentSoundPath);
                                     soundMeterView.clearData();
                                     appLoop.setRunning(true);
@@ -185,27 +206,28 @@ public class MainActivity extends ActionBarActivity {
                     //valueMeter.stop();
                     stopWork();
                     if (getShownCount() == RATE_SHOW_1) {
-                        if (getIsNeverShow() == false) {
+                        if (!getIsNeverShow()) {
                             showRateThisAppDialog();
                         }
                     }
                     if (getShownCount() == RATE_SHOW_2) {
-                        if (getIsNeverShow() == false) {
+                        if (!getIsNeverShow()) {
                             showRateThisAppDialog();
                         }
                     }
                     if (getShownCount() == RATE_SHOW_3) {
-                        if (getIsNeverShow() == false) {
+                        if (!getIsNeverShow()) {
                             showRateThisAppDialog();
                             saveIsNeverShow();
                         }
                     }
-                    if (isFirstStart == true) {
+                    if (isFirstStart) {
                         increaseShowCount();
                         isFirstStart = false;
                     }
-                    //showRateThisAppDialog();
-                    //saveToDatabase(String.valueOf(soundMeterView.getMaxDb()));
+                    if (getIsNeverShow()) {
+                        showPromoIfNeeded(false);
+                    }
                 }
             }
         });
@@ -215,6 +237,23 @@ public class MainActivity extends ActionBarActivity {
                 SoundPlayer.playSound(currentSoundPath);
             }
         });
+    }
+
+    /*private void logScreenOpened() {
+        Bundle bundle = new Bundle();
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_NAME, getClass().getSimpleName());
+        bundle.putString(FirebaseAnalytics.Param.SCREEN_CLASS, getClass().getSimpleName());
+        firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle);
+    }*/
+
+    public void setDbValueText(final String dbLevel) {
+        soundValueTextView.setText(dbLevel);
+        maxDbTextView.setText(soundMeterView.getMaxDb() + "");
+        maxDbTextView.setTextColor(generateMaxDbColor(soundMeterView.getMaxDb()));
+    }
+
+    private int generateMaxDbColor(final int dbValue) {
+        return ColorUtils.blendARGB(Color.parseColor("#F44FB2"), Color.parseColor("#6B00FE"), ((float)dbValue / 120.0F));
     }
 
     private void startRecord() {
@@ -227,7 +266,6 @@ public class MainActivity extends ActionBarActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        //recordManager.stopRecordingTest();
                         valueMeter.stopRecording();
                     }
                 }).start();
@@ -268,15 +306,6 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
-    private boolean isRussianLocale() {
-        String lang = Locale.getDefault().getLanguage();
-        if (lang.equals("ru")) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public void setWarningLevel(int warningLevel, int dbLevel) {
         if (warningLevel == WARNING_LEVEL_STOP) {
             warningText.setText(getResources().getString(R.string.noise_level_max));
@@ -285,19 +314,76 @@ public class MainActivity extends ActionBarActivity {
         }
         if (dbLevel >= 0 && dbLevel <= DB_LEVEL_LOW) {
             levelText.setText(R.string.low_level);
-            levelText.setTextColor(getResources().getColor(R.color.low_level_color));
+            //levelText.setTextColor(getResources().getColor(R.color.low_level_color));
         } else if (dbLevel > DB_LEVEL_LOW && dbLevel <= DB_LEVEL_MIDDLE) {
             levelText.setText(R.string.middle_level);
-            levelText.setTextColor(getResources().getColor(R.color.middle_level_color));
+            //levelText.setTextColor(getResources().getColor(R.color.middle_level_color));
         } else if (dbLevel > DB_LEVEL_MIDDLE && dbLevel <= DB_LEVEL_HIGH) {
-            levelText.setTextColor(getResources().getColor(R.color.low_high_level_color));
+            //levelText.setTextColor(getResources().getColor(R.color.low_high_level_color));
             levelText.setText(R.string.low_high_level);
         } else if (dbLevel > DB_LEVEL_HIGH && dbLevel < DB_LEVEL_VERY_HIGH) {
-            levelText.setTextColor(getResources().getColor(R.color.high_level_color));
+            //levelText.setTextColor(getResources().getColor(R.color.high_level_color));
             levelText.setText(R.string.high_level);
         } else if (dbLevel > DB_LEVEL_VERY_HIGH) {
-            levelText.setTextColor(getResources().getColor(R.color.very_high_color));
+            //levelText.setTextColor(getResources().getColor(R.color.very_high_color));
             levelText.setText(R.string.very_high_level);
+        }
+        levelText.setTextColor(generateColor(dbLevel));
+    }
+
+    private int generateColor(final int dbValue) {
+        return ColorUtils.blendARGB(Color.parseColor("#6B00FE"), Color.parseColor("#F44FB2"), ((float)dbValue / 120.0F));
+    }
+
+    private void showPromoIfNeeded(final boolean fromRateApp) {
+        if (AppDataStore.getIsPromoShown(this)) {
+            return;
+        }
+        if (fromRateApp) {
+            if (getIsNeverShow()) {
+                showPromoDialog();
+            }
+        } else {
+            showPromoDialog();
+        }
+    }
+
+    private void showPromoDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final LayoutInflater inflater = LayoutInflater.from(this);
+        final View view = inflater.inflate(R.layout.promo_layout, null);
+        builder.setView(view);
+        final Dialog dialog = builder.create();
+
+        final ImageView promoImageView = view.findViewById(R.id.promoImage);
+        final ImageView closeButton = view.findViewById(R.id.closeButton);
+        closeButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        final Button downloadButton = view.findViewById(R.id.downloadButton);
+        downloadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openPromoApp();
+                dialog.dismiss();
+            }
+        });
+
+        Glide.with(this).load(R.raw.promo).into(promoImageView);
+        dialog.setCancelable(false);
+        dialog.show();
+        AppDataStore.setIsPromoShown(this, true);
+    }
+
+    private void openPromoApp() {
+        final String appPackageName = "com.capcorn.twozerofe";
+        try {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
         }
     }
 
@@ -306,7 +392,7 @@ public class MainActivity extends ActionBarActivity {
         final LayoutInflater inflater = LayoutInflater.from(this);
         final View view = inflater.inflate(R.layout.rate_app_dialog, null);
         builder.setView(view);
-        final Button rateNow = (Button) view.findViewById(R.id.rate_now);
+        final Button rateNow = view.findViewById(R.id.rate_now);
         final Dialog dialog = builder.create();
         rateNow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -315,26 +401,28 @@ public class MainActivity extends ActionBarActivity {
                 intent.setData(Uri.parse("market://details?id=com.cornford.games.pipepower"));
                 if (!startIntent(intent)) {
                     intent.setData(Uri.parse("https://play.google.com/store/apps/details?id=com.cornford.games.pipepower"));
-                    saveIsNeverShow();
                     if (!startIntent(intent)) {
                         Toast.makeText(MainActivity.this, "Could not open Android market, please install the market app.", Toast.LENGTH_SHORT).show();
                     }
                 }
+                saveIsNeverShow();
                 dialog.dismiss();
             }
         });
-        final Button rateNotNow = (Button) view.findViewById(R.id.rate_not_now);
+        final Button rateNotNow = view.findViewById(R.id.rate_not_now);
         rateNotNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
+                showPromoIfNeeded(false);
                 dialog.dismiss();
             }
         });
-        final Button rateNever = (Button) view.findViewById(R.id.rate_never);
+        final Button rateNever = view.findViewById(R.id.rate_never);
         rateNever.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View view) {
                 saveIsNeverShow();
+                showPromoIfNeeded(true);
                 dialog.dismiss();
             }
         });

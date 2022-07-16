@@ -1,4 +1,4 @@
-package com.cornford.games.pipepower;
+package com.cornford.games.pipepower.data;
 
 import android.provider.BaseColumns;
 

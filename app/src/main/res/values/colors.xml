@@ -9,4 +9,6 @@
     <item name="very_high_color" type="color">#FFff0202</item>
     <item name="warning_text_color" type="color">#FF89d2e7</item>
 
+    <item name="text_color" type="color">#7789A5</item>
+
 </resources>

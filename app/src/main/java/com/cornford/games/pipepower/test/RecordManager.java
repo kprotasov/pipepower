@@ -1,4 +1,4 @@
-package com.cornford.games.pipepower;
+package com.cornford.games.pipepower.test;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;

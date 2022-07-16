@@ -1,4 +1,4 @@
-package com.cornford.games.pipepower;
+package com.cornford.games.pipepower.data;
 
 /**
  * Created by kprotasov on 12.04.2016.

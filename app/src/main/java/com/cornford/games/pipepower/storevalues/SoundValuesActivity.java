@@ -9,9 +9,9 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import com.cornford.games.pipepower.R;
-import com.cornford.games.pipepower.SoundValueContract;
-import com.cornford.games.pipepower.SoundValueDbHelper;
-import com.cornford.games.pipepower.SoundValueEntity;
+import com.cornford.games.pipepower.data.SoundValueContract;
+import com.cornford.games.pipepower.data.SoundValueDbHelper;
+import com.cornford.games.pipepower.data.SoundValueEntity;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -35,10 +35,10 @@ public class SoundValuesActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sound_list_view);
 
-        parentContainer = (LinearLayout) findViewById(R.id.parentContainer);
+        parentContainer = findViewById(R.id.parentContainer);
 
-        AdView mAdView = (AdView) findViewById(R.id.adViewList);
-        AdRequest adRequest = new AdRequest.Builder().build();//.addTestDevice("FBF9D9A996CCF942022738FDB7816B1E").build();
+        AdView mAdView = findViewById(R.id.adViewList);
+        AdRequest adRequest = new AdRequest.Builder().addTestDevice("DEE6B64D413427EA2E32503865D21D83").build();
         mAdView.loadAd(adRequest);
         mAdView.setAdListener(new AdListener() {
             @Override
@@ -53,7 +53,7 @@ public class SoundValuesActivity extends Activity {
             }
         });
 
-        listView = (ListView) findViewById(R.id.listView);
+        listView = findViewById(R.id.listView);
         adapter = new SoundValuesAdapter(this, R.layout.sound_value_item, soundList);
         listView.setAdapter(adapter);
         readFromDatabase();

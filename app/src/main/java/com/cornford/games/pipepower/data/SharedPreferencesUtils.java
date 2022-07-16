@@ -1,4 +1,4 @@
-package com.cornford.games.pipepower;
+package com.cornford.games.pipepower.data;
 
 import android.annotation.TargetApi;
 import android.content.SharedPreferences;

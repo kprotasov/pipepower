@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">PipePower</string>
+    <string name="app_name">Шумомер</string>
     <string name="sound_values">История</string>
 
     <string name="hello_world">Hello world!</string>
@@ -9,11 +9,11 @@
     <string name="banner_ad_unit_history">ca-app-pub-8339160487325972/8237516441</string>
     <string name="noise_level_max">Максимальный шум:</string>
     <string name="noise_level">Уровень шума:</string>
-    <string name="low_level">Низкий уровень</string>
-    <string name="middle_level">Средний уровень</string>
-    <string name="low_high_level">Повышенный уровень</string>
-    <string name="high_level">Высокий уровень</string>
-    <string name="very_high_level">Неприемлимый уровень</string>
+    <string name="low_level">Низкий</string>
+    <string name="middle_level">Средний</string>
+    <string name="low_high_level">Повышенный</string>
+    <string name="high_level">Высокий</string>
+    <string name="very_high_level">Неприемлимый</string>
 
     <string name="rate_this_app">Оценить приложение?</string>
     <string name="rate_now">Да</string>
@@ -24,6 +24,9 @@
 
     <string name="accept_privacy_policy">Accept</string>
     <string name="close_privacy_policy">Close</string>
+
+    <string name="promo_text">Лучшая логическая игра жанра 2048!</string>
+    <string name="promo_button_download">Скачать</string>
 
     <string name="privacy_policy_text">PipePower Privacy Policy\n\n This Privacy policy will notify that how we
         collect, use, share and disclose your information. By installing the apps on your device, entering into,

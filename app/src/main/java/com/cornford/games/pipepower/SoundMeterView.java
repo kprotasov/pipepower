@@ -5,8 +5,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LightingColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -123,7 +126,12 @@ public class SoundMeterView extends View {
     @Override
     public void onDraw(Canvas canvas){
         measureFps();
-        canvas.drawBitmap(speedometerBase, 0, 0, null);
+        //canvas.drawBitmap(speedometerBase, 0, 0, null);
+
+        Paint paint = new Paint();
+        paint.setColorFilter(new LightingColorFilter(Color.parseColor("#FF4081"), Color.BLACK));
+        canvas.drawBitmap(speedometerBase, 0, 0, paint);
+
         float xcp = (float)((float)speedometerBase.getWidth() * 0.5 - (float)arrowCenter.getWidth() * 0.5);
         float ycp = (float)((float)speedometerBase.getHeight() * 0.5 - (float)arrowCenter.getHeight() * 0.5);
         canvas.drawBitmap(arrowCenter, xcp, ycp, null);
